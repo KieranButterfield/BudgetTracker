@@ -1,23 +1,9 @@
-require('dotenv').config();
-console.log('PASSWORD LOADED AS:', process.env.DB_PASSWORD);
-const { Pool } = require('pg');
 const express = require('express');
+const router = express.Router();
+const pool = require('../db');
 
-const app = express();
-app.use(express.json());
-const port = 8080;
-
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  connectionTimeoutMillis: 5000,
-});
-
-// Transaction Get endpoint
-app.get('/transactions', async (req, res) => {
+// Transactions Get endpoint
+router.get('/', async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM transactions");
     res.send(result.rows);
@@ -27,8 +13,8 @@ app.get('/transactions', async (req, res) => {
   }
 });
 
-// Transaction Post endpoint
-app.post('/transactions', async (req, res) => {
+// Transactions Post endpoint
+router.post('/', async (req, res) => {
   try{
   const {description, amount_cents, transaction_date, category_id} = req.body;
   const result = await pool.query(
@@ -42,8 +28,8 @@ app.post('/transactions', async (req, res) => {
 }
   });
 
- // Transaction Delete endpoint
-app.delete('/transactions/:id', async (req, res) => {
+ // Transactions Delete endpoint
+router.delete('/:id', async (req, res) => {
   try{
   const {id} = req.params;
   const result = await pool.query(
@@ -56,8 +42,8 @@ app.delete('/transactions/:id', async (req, res) => {
 }
   });
  
-  // Transaction Put endpoint
-app.put('/transactions/:id', async (req, res) => {
+  // Transactions Put endpoint
+router.put('/:id', async (req, res) => {
   try{
   const { id } = req.params;
   const {description, amount_cents, transaction_date, category_id} = req.body;
@@ -72,9 +58,4 @@ app.put('/transactions/:id', async (req, res) => {
 }
   });
 
-
-
-
-  app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-  })
+  module.exports = router;
