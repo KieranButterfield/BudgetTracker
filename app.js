@@ -3,14 +3,18 @@ const app = express();
 app.use(express.json());
 const port = 8080;
 
-const transactionsRouter = require('./routes/transactions');
-app.use('/transactions', transactionsRouter);
+const makeCrudRouter = require('./routes/crudFactory');
 
-const budgetsRouter = require('./routes/transactions');
-app.use('/budgets', budgetsRouter);
+app.use('/transactions', makeCrudRouter(
+  'transactions',
+  ['description', 'amount_cents', 'transaction_date', 'category_id'],
+  ['amount_cents', 'transaction_date', 'category_id'
+  ]
+));
 
-const categoriesRouter = require('./routes/categories');
-app.use('/categories', categoriesRouter);
+app.use('/budgets', makeCrudRouter('budgets', ['category_id', 'limit_cents', 'month']));
+
+app.use('/categories', makeCrudRouter('categories', ['name']));
 
 
 app.listen(port, () => {
